@@ -24,7 +24,8 @@ parser = argparse.ArgumentParser(description='Generate a bed file Covering the p
 parser.add_argument('assembly', type=str, help='assembly to use (ex: mm10, hg19)')
 parser.add_argument('--outfile', help='output file name . Default is assembly name + "_promoter_"+size+".bed"')
 parser.add_argument('--color', help='color, as a RGB triplet, comma separated (ex:"250,120,120")')
-parser.add_argument('--size', help='size of the promoter in bp (default:1000)')
+parser.add_argument('--size', help='size of the promoter in bp, upstream the TSS (default:1000)')
+parser.add_argument('--sizeDown', help='size of the promoter in bp, downstream the TSS (default:0)')
 parser.add_argument('--dataPath', help='set the dataPath')
 
 cs_utils.printProgString()
@@ -37,8 +38,12 @@ tempdir=tempfile.mkdtemp()
 
 
 promSize=1000
+promSizeDown=0
 if args.size:
 	promSize=int(args.size)
+
+if args.sizeDown:
+	promSizeDown=int(args.sizeDown)
 
 dataPath = cs_utils.getDefault('dataPath')+"/genomes/"
 if args.dataPath:
@@ -50,7 +55,7 @@ if args.color:
 	color=args.color
 
 
-bedFile=args.assembly+"_promoter_"+str(promSize)+".bed"
+bedFile=args.assembly+"_promoter_-"+str(promSize)+"_+_"+str(promSizeDown)+".bed"
 if args.outfile:
 	bedFile=args.outfile
 
@@ -66,6 +71,7 @@ if not os.path.isfile(geneFile):
 geneFile=geneFile.rstrip()
 
 print (colored("Writing promoter bed for genome "+args.assembly+" to " + bedFile,'blue'))
+print ("Generating bed file from -%i to +%i from TSS" %(promSize,promSizeDown))
 bedFileHandle=open(tempdir+"/tmp.bed","w")
 with open(geneFile,"r") as f:
 		for line in f:
@@ -76,9 +82,11 @@ with open(geneFile,"r") as f:
 			if strand =="+":
 				end=int(spline[4])
 				start=end-(promSize+1)
+				end=end+promSizeDown
 			else:
 				start=int(spline[5])
 				end=start+(promSize+1)
+				start=start-promSizeDown
 			if start<0:
 				start=0
 			if end<0:
