@@ -90,6 +90,7 @@ with open(regionsBed,"r") as f:
 		totalLines+=1
 
 myLine=0
+totalSize=0
 with open(regionsBed,"r") as f:
 
 	for line in f:
@@ -121,11 +122,21 @@ with open(regionsBed,"r") as f:
 			for key,value in countDict.iteritems():
 				output.write(SEP+str(value))
 			size=int(end)-int(start)
+			totalSize+=size
 			output.write(SEP+str(size))
 			for key,value in countDict.iteritems():
 				output.write(SEP+str((float(value)/float(size))))
 			output.write("\n")
 
 output.close()
+#Write statistics.
+print "Motifs found (per Kb):"
+for key,value in motifDict.iteritems():
+	print "%s: %.2f motifs/Kb" % (key,(float(value)/totalSize)*1000)
 
+print "Motifs found (per region):"
+for key,value in motifDict.iteritems():
+	print "%s: %.2f motifs/region" % (key,(float(value)/myLine))
+print "Average region size: %i bp" %( totalSize/myLine)
+print "Number of regions: %i" % (myLine)
 shutil.rmtree(tempdir)

@@ -57,7 +57,9 @@ with open(args.inputBed,"r") as g:
 				end=half+(size/2)
 				outfileHandle.write("%s\t%s\t%s" % (spline[0],str(start),str(end)))
 				if len(spline)>3:
-					outfileHandle.write("\t%s\t%s\t%s" % (spline[3],spline[4],spline[5]))
+					outfileHandle.write("\t%s\t%s" % (spline[3],spline[4]))
+				if len(spline)>5:
+					outfileHandle.write("\t%s" % (spline[5]))
 				if len(spline)>6:
 					outfileHandle.write("\t%s\t%s" % (start,end))
 				if len(spline)>8:
