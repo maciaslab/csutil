@@ -37,15 +37,15 @@ for item in args.bed:
 		itemInfo = os.stat(item)
 		bytesSize+=itemInfo.st_size
 	else:
-		print "File "+item+" not found."
+		print ("File "+item+" not found.")
 		exit(1)
 
-
+print ("Writing to "+outFile)
 
 outBed=open(tempdir+"/tmp.bed","w")
 
 
-print "Merging..."
+print ("Merging...")
 
 loop=0
 for item in args.bed:
@@ -62,6 +62,6 @@ outBed.close()
 cs_utils.finishProgress()
 
 
-print "Sorting..."
+print ("Sorting...")
 cs_utils.cleanBed(tempdir+"/tmp.bed",outFile,args.uniq)
 shutil.rmtree(tempdir)

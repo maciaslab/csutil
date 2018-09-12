@@ -1,3 +1,4 @@
+from __future__ import print_function
 import urllib
 import os
 import zipfile
@@ -9,9 +10,16 @@ from tabulate import tabulate
 import gzip
 import shutil
 import random
-from string import letters
+from string import ascii_letters
 import natsort
 import sys
+
+if sys.version_info[0] >= 3:
+#Python3
+    from urllib.request import urlretrieve # pylint: disable=import-error,E0611
+else:
+#Python2
+    from urllib import urlretrieve # pylint: disable=import-error
 
 #Requires: bedtools
 #Citations
@@ -89,7 +97,7 @@ def cleanBed(inputbed, outputbed,uniq=False):
     bedFileHandle.writelines(data)
 
 def removeletters(mystring):
-    return mystring.translate(None, letters)
+    return mystring.translate(None, ascii_letters)
 
 def joinChr_start(line):
     a=line.split('\t')
@@ -147,8 +155,9 @@ def finishProgress():
 
 
 def downloadFile(url, filename):
-    print "Downloading "+url+" to "+filename
-    urllib.urlretrieve(url, filename, showProgressDownload)
+
+    print ("Downloading "+url+" to "+filename)
+    urlretrieve(url, filename, showProgressDownload)
 
 
 def humanBytes(B):
@@ -208,10 +217,10 @@ def getbedtools(verbose=True,quit_err=True):
     bedtools_exec=which("bedtools")
     if (bedtools_exec):
         if (verbose):
-            print "bedtools executable found: "+ bedtools_exec
+            print ("bedtools executable found: "+ bedtools_exec)
     else:
         if (verbose):
-            print "bedtools executable not found. Install bedtools from http://bedtools.readthedocs.io/en/latest/"
+            print ("bedtools executable not found. Install bedtools from http://bedtools.readthedocs.io/en/latest/")
         if (quit_err):
             exit(1)
     return bedtools_exec
@@ -220,10 +229,10 @@ def getfuzznuc(verbose=True,quit_err=True):
     fuzznuc_exec=which("fuzznuc")
     if (fuzznuc_exec):
         if (verbose):
-            print "fuzznuc executable found: "+ fuzznuc_exec
+            print ("fuzznuc executable found: "+ fuzznuc_exec)
     else:
         if (verbose):
-            print "fuzznuc executable not found. Install emboss from http://emboss.sourceforge.net/"
+            print ("fuzznuc executable not found. Install emboss from http://emboss.sourceforge.net/")
         if (quit_err):
             exit(1)
     return fuzznuc_exec

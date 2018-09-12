@@ -9,6 +9,7 @@ import collections
 import cs_utils
 import math
 import pandas as pd
+
 #Experimental
 
 
@@ -17,6 +18,7 @@ parser.add_argument('motifs', type=str, help='Bed file containing motifs')
 parser.add_argument('regions', help='Bed file with the regions to count motifs in')
 parser.add_argument('--outfile', help='output file name . Default is region bed filename + "_dist.csv"')
 parser.add_argument('--tsv', action="store_true",help='Output is .tsv instead of .csv')
+parser.add_argument('--plot', action="store_true",help='Plot histogram in terminal')
 
 cs_utils.printProgString()
 args = parser.parse_args()
@@ -37,19 +39,21 @@ if args.outfile:
 
 #Check if files exist, exit if not.
 if not os.path.isfile(motifsBed):
-	print "File "+motifsBed+" not found."
+	print ("File "+motifsBed+" not found.")
 	exit(1)
 if not os.path.isfile(regionsBed):
-	print "File "+regionsBed+" not found."
+	print ("File "+regionsBed+" not found.")
 	exit(1)
 
 tempdir=tempfile.mkdtemp()
 
 #Get motifs only in regions file. This makes the file smaller.
-miniBed=tempdir+"/tempmotifs.bed"
-command=bedtools_exec +" intersect -a "+motifsBed+" -b "+ regionsBed+" >"+miniBed
+miniBedTemp=tempdir+"/tempmotifs.bed"
+miniBed=tempdir+"/tempmotifs2.bed"
+command=bedtools_exec +" intersect -a "+motifsBed+" -b "+ regionsBed+" >"+miniBedTemp
 os.system(command)
-
+#Sort and remove duplicates
+cs_utils.cleanBed(miniBedTemp,miniBed,True)
 motifDict=collections.OrderedDict()
 
 #Open new bedfile and list motifs.
@@ -63,14 +67,14 @@ with open(miniBed,"r") as f:
 			motifDict[myMotif]=1
 
 emptyCountDict=collections.OrderedDict()
-print "Motifs found (total):"
-for key,value in motifDict.iteritems():
-	print "%s: %i" % (key,value)
+print ("Motifs found (total):")
+for key,value in motifDict.items():
+	print ("%s: %i" % (key,value))
 	emptyCountDict[key]=0
 
 
 
-print "Writing to "+outFile
+print ("Writing to "+outFile)
 
 
 
@@ -97,6 +101,7 @@ with open(regionsBed,"r") as f:
 			regionField=cr+":"+str(start)+"-"+str(end)
 			#print (regionField)
 			positions=[]
+			#print("--------")
 			with open(miniBed,"r") as g:
 					for lineg in g:
 							if lineg[0:5] != "track":
@@ -106,14 +111,15 @@ with open(regionsBed,"r") as f:
 								endg=int(splineg[2])
 								motifg=splineg[3]
 								middle=int(math.floor((startg+endg)/2))
-								
 								if (cr==crg) and ((startg>=start and startg<=end) or (endg>=start and endg<=end)):
+									#print (lineg)
 									#print (motifg,middle)
 									positions.append(middle)
 									countDict[motifg]+=1
-
+			#print("***")
 			#print(positions)
 			while (len(positions) != 0):
+
 					p=positions.pop()
 					for value in positions:
 						mydiff=abs(p-value)
@@ -130,4 +136,8 @@ counts=counts.sort_values(by=['distance'])
 counts=counts[['distance','frequency']]
 #print (counts)
 counts.to_csv(outFile,index=False,sep=SEP)
+#print(miniBed)
+if args.plot:
+	from bashplotlib.histogram import plot_hist 
+	plot_hist(distances,bincount=80,xlab=True,pch="█")
 shutil.rmtree(tempdir)

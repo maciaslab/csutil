@@ -3,10 +3,17 @@
 
 
 import cs_utils
-import pip
 import os
+import pip
+from distutils.version import StrictVersion
+
+if StrictVersion(pip.__version__) >= StrictVersion("10.0.0"):
+    from pip._internal.utils.misc import get_installed_distributions
+else:
+    from pip import get_installed_distributions # pylint: disable=import-error,E0611
 
 cs_utils.printProgString()
+
 
 tests=0
 passed_tests=0
@@ -14,8 +21,8 @@ passed_tests=0
 
 print("Checking needed packages:\n")
 err_=False
-required_pkgs = ['biopython', 'tabulate','termcolor','natsort','pandas','progressbar','regex','requests','xmltodict']
-installed_pkgs = [pkg.key for pkg in pip.get_installed_distributions()]
+required_pkgs = ['biopython', 'tabulate','termcolor','natsort','pandas','progressbar2','regex','requests','xmltodict','bashplotlib']
+installed_pkgs = [pkg.key for pkg in get_installed_distributions()]
 
 for package in required_pkgs:
     if package not in installed_pkgs:
@@ -25,7 +32,7 @@ for package in required_pkgs:
          print (package +" found.")
 tests=tests+1
 if (err_):
-    print "\nInstall missing packages with:\npip install packagename\n"
+    print ("\nInstall missing packages with:\npip install packagename\n")
 if not(err_):
     passed_tests=passed_tests+1
 
@@ -41,8 +48,8 @@ if (os.environ.get('GENOME_DATAPATH') == None):
         print ("\nEnvironment variable GENOME_DATAPATH is not set.\nFor more info check the installation instructions.")
 
 print("\n")
-print "Tests passed %i / %i" % (passed_tests, tests)
+print ("Tests passed %i / %i" % (passed_tests, tests))
 if (passed_tests == tests):
-    print "Installation is correct."
+    print ("Installation is correct.")
 else:
-    print "There are errors."
+    print ("There are errors.")

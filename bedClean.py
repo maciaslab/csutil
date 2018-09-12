@@ -40,9 +40,9 @@ bed=args.bed
 out_bed=bed+".clean"
 if args.outBed:
     out_bed=args.outBed
-print "Generating: "+out_bed
+print ("Generating: "+out_bed)
 if (args.uniq):
-    print "Removing duplicates"
+    print ("Removing duplicates")
 
 cs_utils.cleanBed(bed,out_bed,args.uniq)
 

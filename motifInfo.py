@@ -26,7 +26,7 @@ parser.add_argument('TF', type=str, help='TF to query')
 
 cs_utils.printProgString()
 args = parser.parse_args()
-print "TF: "+args.TF
+print ("TF: "+args.TF)
 
 tempdir=tempfile.mkdtemp()
 HEADERS = {'accept': 'application/json'}
@@ -36,7 +36,7 @@ response_json_dict = response.json()
 results=response_json_dict.get("results","")
 for i in results:
 	matrix=i.get("matrix_id","")
-	print "MATRIX: "+matrix
+	print ("MATRIX: "+matrix)
 	URL = "http://jaspar.genereg.net/api/v1/matrix/"+matrix+".pfm"
 	response2 = requests.get(URL)
 	e=open(tempdir+"/temp.pfm","w")
@@ -47,8 +47,8 @@ for i in results:
 	e.close()
 	with open(tempdir+"/temp.pfm") as handle:
 		m = motifs.read(handle, "pfm")
-	print "CONSENSUS: "+m.degenerate_consensus+" / "+m.degenerate_consensus.reverse_complement()
-	print "MATRIX:"
-	print m.pwm
+	print ("CONSENSUS: "+m.degenerate_consensus+" / "+m.degenerate_consensus.reverse_complement())
+	print ("MATRIX:")
+	print (m.pwm)
 shutil.rmtree(tempdir)
 

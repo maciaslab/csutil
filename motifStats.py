@@ -20,7 +20,7 @@ import cs_utils
 startTime = time.time()
 
 parser = argparse.ArgumentParser(
-    description='Resize a csv file from countMotifs and prints statistics')
+    description='Reads a csv file from countMotifs and prints statistics')
 parser.add_argument('inputCSV', type=str, help='input CSV file')
 parser.add_argument(
     '--outfile', help='output file name . Default is "motifcount.csv"')
@@ -30,14 +30,14 @@ parser.add_argument(
 cs_utils.printProgString()
 args = parser.parse_args()
 
-print "Input: "+args.inputCSV
+print ("Input: "+args.inputCSV)
 
 SEP = ","
 inputFile = args.inputCSV
 outFile = "motifcount.csv"
 if args.outfile:
     outFile = args.outfile
-print "Output: "+outFile
+print ("Output: "+outFile+"\n")
 
 if not (os.path.isfile(inputFile)):
     print ("\nERROR: %s not found\n" % (inputFile))
@@ -54,7 +54,7 @@ if args.combine:
             size_col = df.columns.get_loc("SIZE")
 
             for i in range(1, size_col):
-                print df.columns[i]
+                print (df.columns[i])
             exit(1)
         df[colname] = df[nam]+df[colname]
 
@@ -67,9 +67,12 @@ header = "MOTIF"+SEP+"0"+SEP+"1"+SEP+"2"+SEP+"3+"+SEP+"MEAN"+SEP+"SUM"
 lines=""
 for i in range(1, size_col):
 
-    print df.columns[i]
-    print "Mean: "+str(df[df.columns[i]].mean()) + " motifs per region"
-    print "Sum: "+str(df[df.columns[i]].sum()) + " motifs"
+    print (df.columns[i])
+    print ("Mean: %.3f motifs per region" % float(df[df.columns[i]].mean()))
+    print ("Average region size: %.3f Kb" % (float(df['SIZE'].mean())/1000))
+    print ("Mean: %.3f motifs per Kb" % ( (float(df[df.columns[i]].mean())) / (float(df['SIZE'].mean())/1000) )   )
+    print ("Sum: "+str(df[df.columns[i]].sum()) + " motifs")
+    print ("\n")
     #print df.iloc[i]
     categories = pandas.cut(df[df.columns[i]], bins, labels=group_names)
     #print categories
@@ -86,9 +89,9 @@ for i in range(1, size_col):
 # group
 if args.combine:
     i = df.columns.get_loc(colname)
-    print df.columns[i]
-    print "Mean: "+str(df[df.columns[i]].mean()) + " motifs per region"
-    print "Sum: "+str(df[df.columns[i]].sum()) + " motifs"
+    print (df.columns[i])
+    print ("Mean: "+str(df[df.columns[i]].mean()) + " motifs per region")
+    print ("Sum: "+str(df[df.columns[i]].sum()) + " motifs")
     #print df.iloc[i]
     categories = pandas.cut(df[df.columns[i]], bins, labels=group_names)
     #print categories
@@ -108,7 +111,7 @@ wlin=header
 for line2 in sorted(lines.split("\n"), key=lambda line: line.split(",")[0]):
     if (line2 != ""):
         wlin=wlin+"\n"+line2
-print wlin
+#print (wlin)
 ou = open(outFile, "w")
 ou.write(wlin)
 ou.close()

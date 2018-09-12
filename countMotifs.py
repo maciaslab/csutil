@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
+from __future__ import print_function
 import argparse
 import os
 import progressbar
@@ -7,6 +8,7 @@ import tempfile
 import shutil
 import collections
 import cs_utils
+
 
 # Requires: bed file of motifs (made with bedmotif + mergebed)
 # bed file of Chipseq (regions)
@@ -38,10 +40,10 @@ if args.outfile:
 
 #Check if files exist, exit if not.
 if not os.path.isfile(motifsBed):
-	print "File "+motifsBed+" not found."
+	print ("File "+motifsBed+" not found.")
 	exit(1)
 if not os.path.isfile(regionsBed):
-	print "File "+regionsBed+" not found."
+	print ("File "+regionsBed+" not found.")
 	exit(1)
 
 tempdir=tempfile.mkdtemp()
@@ -64,20 +66,20 @@ with open(miniBed,"r") as f:
 			motifDict[myMotif]=1
 
 emptyCountDict=collections.OrderedDict()
-print "Motifs found (total):"
-for key,value in motifDict.iteritems():
-	print "%s: %i" % (key,value)
+print ("Motifs found (total):")
+for key,value in motifDict.items():
+	print ("%s: %i" % (key,value))
 	emptyCountDict[key]=0
 
 
 
-print "Writing to "+outFile
+print ("Writing to "+outFile)
 output=open(outFile,"w")
 output.write("REGION")
-for key,value in motifDict.iteritems():
+for key,value in motifDict.items():
 	output.write(SEP+key)
 output.write(SEP+"SIZE")
-for key,value in motifDict.iteritems():
+for key,value in motifDict.items():
 	output.write(SEP+key+"/Kb")
 
 output.write("\n")
@@ -119,24 +121,24 @@ with open(regionsBed,"r") as f:
 
 			
 			output.write(regionField)
-			for key,value in countDict.iteritems():
+			for key,value in countDict.items():
 				output.write(SEP+str(value))
 			size=int(end)-int(start)
 			totalSize+=size
 			output.write(SEP+str(size))
-			for key,value in countDict.iteritems():
+			for key,value in countDict.items():
 				output.write(SEP+str((float(value)/float(size))))
 			output.write("\n")
 
 output.close()
 #Write statistics.
-print "Motifs found (per Kb):"
-for key,value in motifDict.iteritems():
-	print "%s: %.2f motifs/Kb" % (key,(float(value)/totalSize)*1000)
+print ("Motifs found (per Kb):")
+for key,value in motifDict.items():
+	print ("%s: %.2f motifs/Kb" % (key,(float(value)/totalSize)*1000))
 
-print "Motifs found (per region):"
-for key,value in motifDict.iteritems():
-	print "%s: %.2f motifs/region" % (key,(float(value)/myLine))
-print "Average region size: %i bp" %( totalSize/myLine)
-print "Number of regions: %i" % (myLine)
+print ("Motifs found (per region):")
+for key,value in motifDict.items():
+	print ("%s: %.2f motifs/region" % (key,(float(value)/myLine)))
+print ("Average region size: %i bp" %( totalSize/myLine))
+print ("Number of regions: %i" % (myLine))
 shutil.rmtree(tempdir)

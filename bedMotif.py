@@ -81,11 +81,11 @@ elif os.path.isfile(dataPath+"/genomes/"+args.fasta+"/"+args.fasta+".fasta"):
 elif os.path.isfile(dataPath+"/genomes/"+args.fasta+"/"+args.fasta+".fa"):
 	fastaFile = dataPath+"/genomes/"+args.fasta+"/"+args.fasta+".fa"	
 else:
-	print "Fasta file not found. If it is a genome, dowload it with:\ndownloadgenome "+args.fasta
+	print ("Fasta file not found. If it is a genome, dowload it with:\ndownloadgenome "+args.fasta)
 	exit(1)
 
 
-print "Generating: "+bedFile
+print ("Generating: "+bedFile)
 tempdir=tempfile.mkdtemp()
 
 
@@ -100,11 +100,11 @@ for i in args.motifs.split(","):
 
 
 motif="|".join(motiflist)
-print "Searching for the following motifs:"
-print"Chain+:"
+print ("Searching for the following motifs:")
+print ("Chain+:")
 for i in motiflist:
 	print(i)
-print"Chain-:"
+print ("Chain-:")
 for i in reversemotiflist:
 	print(i)	
 
@@ -145,7 +145,9 @@ for item in records:
 	for match in iterator:
 		bedFileHandle.write("%s\t%i\t%i\t%s\t0\t%s\t%i\t%i\t%s\n" % (item.id,match.start(),match.end(),motifname,chain,match.start(),match.end(),color ) )
 
-print "Sorting..."
+bedFileHandle.close()
+print ("Sorting...")
+#print (tempdir+"/tmp.bed")
 cs_utils.cleanBed(tempdir+"/tmp.bed",bedFile,False)
 shutil.rmtree(tempdir)
 

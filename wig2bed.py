@@ -25,7 +25,7 @@ parser.add_argument('--outfile_int', help='output (internal bed) file name . Def
 cs_utils.printProgString()
 args = parser.parse_args()
 
-print "Input: "+args.input
+print ("Input: "+args.input)
 
 
 tempdir=tempfile.mkdtemp()
@@ -35,8 +35,8 @@ if args.outfile:
 	outfile=args.outfile
 if args.outfile_int:
 	outfile_int=args.outfile_int
-print "Output: "+outfile
-print "Internal Output: "+outfile_int
+print ("Output: "+outfile)
+print ("Internal Output: "+outfile_int)
 ofh= open (tempdir+"/tmp.bed","w")
 ofih= open (tempdir+"/tmp2.bed","w")
 j=0
@@ -69,7 +69,7 @@ ofh.write("%s\t%s\t%s\n" % (cr,str(start),str(end)))
 ofh.close()
 ofih.close()
 
-print "Sorting..."
+print ("Sorting...")
 
 cs_utils.cleanBed(tempdir+"/tmp.bed",outfile,True)
 cs_utils.cleanBed(tempdir+"/tmp2.bed",outfile_int,True)

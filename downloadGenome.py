@@ -11,6 +11,7 @@ import tabulate
 import tarfile
 import shutil
 import gzip
+import re
 
 
 parser = argparse.ArgumentParser(description='Download genomes from ucsc.')
@@ -25,8 +26,8 @@ args = parser.parse_args()
 
 def listGenomes():
     
-    print colored("List of supported genomes:\n",'blue')
-    print tabulate.tabulate(getGenomeList(),["Assembly","Description"])
+    print (colored("List of supported genomes:\n",'blue'))
+    print (tabulate.tabulate(getGenomeList(),["Assembly","Description"]))
     
     return
 
@@ -63,7 +64,7 @@ def downloadGenome(genome):
     if not(genome in genomes):
         print (colored("Error, assembly '"+genome+ "' not found",'red'))
         exit(1)
-    print colored("Downloading "+genome+".",'blue')
+    print (colored("Downloading "+genome+".",'blue'))
 
     
     genomePath = dataPath+"/genomes/"+genome
@@ -82,36 +83,43 @@ def downloadGenome(genome):
     try:
         os.makedirs(genomePath)
     except OSError:
-        print "Directory already exists or not writable."
-    print "Downloading chromosome sizes \nfrom: "+chromsizes_url+" \nto "+chromsizes_local
+        print ("Directory already exists or not writable.")
+    print ("Downloading chromosome sizes \nfrom: "+chromsizes_url+" \nto "+chromsizes_local)
 
     
 
     cs_utils.downloadFile(chromsizes_url, chromsizes_local)
-    print "Downloading gz \nfrom: "+genome_url+" \nto "+genome_local
+    print ("Downloading gz \nfrom: "+genome_url+" \nto "+genome_local)
     cs_utils.downloadFile(genome_url, genome_local)
     if (is_multi):
-        print "Expanding file..."
+        print ("Expanding file...")
         tf=tarfile.open(name=genome_local,mode="r")
         tf.extractall(path=genomePath+"/temp")
         f = open(chromsizes_local, 'r')
         fastalist=[]
         for line in f.readlines():
-                 spline = line.split()
-                 fastalist.append(genomePath+"/temp/"+spline[0]+".fa")
+                spline = line.split()
+                chr_id=(spline[0].split("_")[0][3:])
+                filename=genomePath+"/temp/"+spline[0]+".fa"
+                filename2=genomePath+"/temp/"+chr_id+"/"+spline[0]+".fa"
+                #print (filename+" "+filename2)
+                if (os.path.isfile(filename)): 
+                    fastalist.append(filename)
+                elif (os.path.isfile(filename2)):
+                    fastalist.append(filename2)
         #print (fastalist)
-        print "Combining file..."
+        print ("Combining file...")
         cs_utils.concatenateFiles(fastalist,genomePath+"/"+genome+".fasta")
         shutil.rmtree(genomePath+"/temp")
         os.remove(genome_local)
 
     else:
-        print "Gzipped file, unzipping"
+        print ("Gzipped file, unzipping")
         with open(genome_local[:-3]+"sta", 'wb') as f_out, gzip.open(genome_local, 'rb') as f_in:
             shutil.copyfileobj(f_in, f_out)
         os.remove(genome_local)
     
-    print "Downloading gz \nfrom: "+refgene_url+" \nto "+refgene_local+".gz"
+    print ("Downloading gz \nfrom: "+refgene_url+" \nto "+refgene_local+".gz")
     cs_utils.downloadFile(refgene_url, refgene_local+".gz")
     with open(refgene_local, 'wb') as f_out, gzip.open(refgene_local+".gz", 'rb') as f_in:
             shutil.copyfileobj(f_in, f_out)

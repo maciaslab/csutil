@@ -63,14 +63,14 @@ if args.outfile:
 
 geneFile=dataPath+"/genomes/"+args.assembly+"/"+"refGene.txt"
 if not os.path.isfile(geneFile):
-	print "File "+geneFile+" not found. Download genome with:"
-	print "downloadgenome.py "+args.assembly
+	print ("File "+geneFile+" not found. Download genome with:")
+	print ("downloadgenome.py "+args.assembly)
 	exit(1)
 
 
 geneFile=geneFile.rstrip()
 
-print (colored("Writing promoter bed for genome "+args.assembly+" to " + bedFile,'blue'))
+print ("Writing promoter bed for genome "+args.assembly+" to " + bedFile)
 print ("Generating bed file from -%i to +%i from TSS" %(promSize,promSizeDown))
 bedFileHandle=open(tempdir+"/tmp.bed","w")
 with open(geneFile,"r") as f:
@@ -95,7 +95,7 @@ with open(geneFile,"r") as f:
 bedFileHandle.close()
 
 
-print "Sorting..."
+print ("Sorting...")
 cs_utils.cleanBed(tempdir+"/tmp.bed",bedFile,True)
 shutil.rmtree(tempdir)
 

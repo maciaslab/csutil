@@ -26,7 +26,7 @@ parser.add_argument('--size', help='size of the promoter in bp (default:200)')
 cs_utils.printProgString()
 args = parser.parse_args()
 
-print "Input: "+args.inputBed
+print ("Input: "+args.inputBed)
 
 
 size=200
@@ -40,12 +40,12 @@ if args.outfile:
 	outputBed=args.outfile
 #Check if files exist, exit if not.
 if not os.path.isfile(args.inputBed):
-	print "File "+args.inputBed+" not found."
+	print ("File "+args.inputBed+" not found.")
 	exit(1)
 
-print "Input: "+args.inputBed
-print "Output: "+outputBed
-print "Size: "+str(size)
+print ("Input: "+args.inputBed)
+print ("Output: "+outputBed)
+print ("Size: "+str(size))
 
 outfileHandle=open(tempdir+"/tmp.bed","w")
 with open(args.inputBed,"r") as g:
@@ -53,8 +53,8 @@ with open(args.inputBed,"r") as g:
 			if line[0:5] != "track":
 				spline=line.split()
 				half=(int(spline[1])+int(spline[2]))/2
-				start=half-(size/2)
-				end=half+(size/2)
+				start=int(half-(size/2))
+				end=int(half+(size/2))
 				outfileHandle.write("%s\t%s\t%s" % (spline[0],str(start),str(end)))
 				if len(spline)>3:
 					outfileHandle.write("\t%s\t%s" % (spline[3],spline[4]))
@@ -69,7 +69,7 @@ with open(args.inputBed,"r") as g:
 outfileHandle.close()
 
 
-print "Sorting..."
+print ("Sorting...")
 cs_utils.cleanBed(tempdir+"/tmp.bed",outputBed,True)
 shutil.rmtree(tempdir)
 
