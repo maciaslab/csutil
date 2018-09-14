@@ -12,22 +12,26 @@ import tarfile
 import shutil
 import gzip
 import re
+import glob
 
 
 parser = argparse.ArgumentParser(description='Download genomes from ucsc.')
 parser.add_argument('genome', type=str, nargs='?', help='genome to download')
 parser.add_argument('--list', help='list available genomes',
                     action="store_true")
+parser.add_argument('--local', help='list already downloaded genomes',
+                    action="store_true")                    
 parser.add_argument('--dataPath', help='set the dataPath')
 
 cs_utils.printProgString()
 args = parser.parse_args()
 
+ok_symbol="✓"
 
 def listGenomes():
     
-    print (colored("List of supported genomes:\n",'blue'))
-    print (tabulate.tabulate(getGenomeList(),["Assembly","Description"]))
+    print ("List of supported genomes:\n")
+    print (tabulate.tabulate(getGenomeList(),["Assembly","Local","Description"],tablefmt="rst"))
     
     return
 
@@ -37,7 +41,12 @@ def getGenomeList():
     mydict = xmltodict.parse(response.text)
     genome_list = []
     for genome in mydict['DASDSN']['DSN']:
-            genome_list.append([genome['SOURCE']['@id'], genome['DESCRIPTION']])
+            genome_name=genome['SOURCE']['@id']
+            genomePath = dataPath+"/genomes/"+genome_name
+            genome_local=""
+            if (os.path.isdir(genomePath)):
+                genome_local=ok_symbol
+            genome_list.append([genome['SOURCE']['@id'],genome_local, genome['DESCRIPTION']])
     return genome_list
 
 def CheckUrls(url1,url2):
@@ -64,7 +73,7 @@ def downloadGenome(genome):
     if not(genome in genomes):
         print (colored("Error, assembly '"+genome+ "' not found",'red'))
         exit(1)
-    print (colored("Downloading "+genome+".",'blue'))
+    print ("Downloading "+genome+".")
 
     
     genomePath = dataPath+"/genomes/"+genome
@@ -125,6 +134,25 @@ def downloadGenome(genome):
             shutil.copyfileobj(f_in, f_out)
 
 
+def localGenomes():
+    
+    genomePath=dataPath+"genomes"
+    genomes=getGenomeList()
+    print ("List of files downloaded to " + genomePath)
+    results=[]
+    for file in glob.glob(genomePath+"/*"):
+        filename=os.path.basename(file)
+        description="Unknown"
+        for item in genomes:
+            if (item[0] == filename):
+                description= item[2]
+        size=cs_utils.humanBytes(cs_utils.get_size(file))
+        results.append([filename,description,size])
+
+        
+    print (tabulate.tabulate(results, ["Genome","Description","Size"], tablefmt="rst"))
+    totalSize=size=cs_utils.humanBytes(cs_utils.get_size(genomePath))
+    print( "Total Size: "+totalSize)
 
 
 dataPath = cs_utils.getDefault('dataPath')+"/genomes/"
@@ -135,6 +163,9 @@ if args.dataPath:
 
 if args.list:
     listGenomes()
+
+if args.local:
+    localGenomes()
 
 if args.genome:
     downloadGenome(args.genome)

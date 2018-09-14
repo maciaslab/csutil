@@ -33,8 +33,9 @@ Various utility functions shared amongst cs_utils programs
 pbar = None
 defaults={
     'dataPath': './data/',
-    'version':'v0.1',
-    'progStringColor':'yellow'
+    'version':'v.1.0',
+    'progStringColor':'yellow',
+    'author':'Pau Martin-Malpartida (M. Macias Lab.) pau.martin@irbbarcelona.org'
 
     }
 
@@ -68,7 +69,7 @@ def concatenateFiles(infile_names,outfile_name):
 
 def printProgString():
     
-        print(colored("\n"+os.path.basename(sys.argv[0])+" "+getDefault('version')+" Pau Martin Malpartida pau.martin@irbbarcelona.org\n",getDefault('progStringColor')))
+        print(colored("\n"+os.path.basename(sys.argv[0])+" "+getDefault('version')+" "+getDefault('author')+"\n",getDefault('progStringColor')))
     
 
 def cleanBed(inputbed, outputbed,uniq=False):
@@ -236,3 +237,11 @@ def getfuzznuc(verbose=True,quit_err=True):
         if (quit_err):
             exit(1)
     return fuzznuc_exec
+
+def get_size(start_path = '.'):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
