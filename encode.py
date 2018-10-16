@@ -13,6 +13,8 @@ import shutil
 import cs_utils
 import glob
 
+import sys  
+
 
 dataPath = cs_utils.getDefault('dataPath')+"/encode/"
 
@@ -131,13 +133,12 @@ def searchEncode(searchstring):
                 assemblies = assemblies+","
             assemblies = assemblies+a
         results.append([item.get("accession", "").encode('utf-8'), assemblies.encode('utf-8'), item.get(
-            "target", "").split("/")[2].encode('utf-8'), item.get("biosample_summary", "").encode('utf-8')])
+            "target", "").split("/")[2].encode('utf-8'), item.get("biosample_summary", "")])
         #print item.get("accession","")+"\t"+assemblies+"\t"+item.get("target","").split("/")[2]+"\t"+item.get("biosample_summary","")
     #print json.dumps(response_json_dict, indent=4, separators=(',', ': '))
     #print (URL)
     
-    print (tabulate(results, ["Accession", "Assemblies", "Target",
-                             "Biosample"], tablefmt="rst"))
+    print(tabulate(results, ["Accession", "Assemblies", "Target","Biosample"], tablefmt="rst"))
     return
 
 
